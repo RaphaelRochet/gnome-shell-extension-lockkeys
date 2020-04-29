@@ -4,9 +4,7 @@ It shows notifications about numlock or capslock state change.
 
 ![Screenshot](https://github.com/kazysmaster/gnome-shell-extension-lockkeys/raw/master/screenshot.png)
 
-The master branch supports gnome-shell 3.22
+Fork of https://github.com/kazysmaster/gnome-shell-extension-lockkeys
+only to tidy things up and ease cloning
 
-The extension is available at http://extensions.gnome.org
-
-In order to manually install this extension, copy lockkeys@vaina.lt to the:
-~/.local/share/gnome-shell/extensions
+In order to manually install this extension, clone into ~/.local/share/gnome-shell/extensions
