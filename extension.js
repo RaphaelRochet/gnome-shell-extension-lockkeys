@@ -1,5 +1,6 @@
 const St = imports.gi.St;
 const Lang = imports.lang;
+const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Clutter = imports.gi.Clutter;
@@ -13,12 +14,7 @@ const PopupMenu = imports.ui.popupMenu;
 const MessageTray = imports.ui.messageTray;
 const Config = imports.misc.config;
 
-const POST_3_36 = parseFloat(Config.PACKAGE_VERSION) >= 3.36;
-const POST_3_34 = parseFloat(Config.PACKAGE_VERSION) >= 3.34;
-const Keymap = POST_3_36 ? Clutter.get_default_backend().get_default_seat().get_keymap():
-			   POST_3_34 ? Clutter.get_default_backend().get_keymap():
-			   imports.gi.Gdk.Keymap.get_default();
-
+const Keymap = Clutter.get_default_backend().get_default_seat().get_keymap();
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Meta = ExtensionUtils.getCurrentExtension();
@@ -92,7 +88,7 @@ const LockKeysIndicator = new Lang.Class({
 		});
 		layoutManager.add_child(this.numIcon);
 		layoutManager.add_child(this.capsIcon);
-		this.add_child_compat(layoutManager);
+		this.add_child(layoutManager);
 		
 		this.numMenuItem = new PopupMenu.PopupSwitchMenuItem(_("Num Lock"), false, { reactive: false });
 		this.menu.addMenuItem(this.numMenuItem);
@@ -109,13 +105,6 @@ const LockKeysIndicator = new Lang.Class({
 		this.indicatorStyle = new HighlightIndicator(this);
 	},
 
-	add_child_compat: function(child) {
-		if (POST_3_34)
-			this.add_child(child);
-		else
-			this.actor.add_child(child);
-	},
-
 	setActive: function(enabled) {
 		if (enabled) {
 			this._keyboardStateChangedId = Keymap.connect('state-changed', Lang.bind(this, this._handleStateChange));
@@ -128,10 +117,16 @@ const LockKeysIndicator = new Lang.Class({
 	}, 
 
 	_handleSettingsMenuItem: function(actor, event) {
-		if (POST_3_36)
-			imports.misc.util.spawn(['gnome-extensions', 'prefs', 'lockkeys@vaina.lt']);
-		else
-			imports.misc.util.spawn(['gnome-shell-extension-prefs', 'lockkeys@vaina.lt']);
+		Gio.DBus.session.call(
+			'org.gnome.Shell.Extensions',
+			'/org/gnome/Shell/Extensions',
+			'org.gnome.Shell.Extensions',
+			'OpenExtensionPrefs',
+			new GLib.Variant('(ssa{sv})', [Meta.uuid, '', {}]),
+			null,
+			Gio.DBusCallFlags.NONE,
+			-1,
+			null);
 	},
 	
 	_handleSettingsChange: function(actor, event) {
