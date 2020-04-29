@@ -1,10 +1,8 @@
-const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 
 const Config = imports.misc.config;
 
 const Gettext = imports.gettext;
-
 
 function getSettings(extension) {
 	let schema = 'org.gnome.shell.extensions.lockkeys';
