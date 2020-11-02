@@ -14,7 +14,9 @@ const PopupMenu = imports.ui.popupMenu;
 const MessageTray = imports.ui.messageTray;
 const Config = imports.misc.config;
 
-const Keymap = Clutter.get_default_backend().get_default_seat().get_keymap();
+const X11 = imports.gi.GLib.getenv('XDG_SESSION_TYPE') == 'x11';
+const Keymap = X11       ? imports.gi.Gdk.Keymap.get_default():
+               Clutter.get_default_backend().get_default_seat().get_keymap();
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Meta = ExtensionUtils.getCurrentExtension();
